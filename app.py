@@ -1309,7 +1309,7 @@ def render_predict_page(model_choice, rf_model, knn_model, svm_model, ann_model,
         )
 
         if model_choice == "Compare all 4":
-            compare_names = ["Random Forest", "SVM", "KNN (baseline)", "ANN"]
+            compare_names = ["Random Forest", "SVM", "KNN", "ANN"]
             selected_compare_model = st.radio(
                 "View prediction for:", compare_names, horizontal=True, key="compare_model_view",
             )
