@@ -1352,7 +1352,7 @@ if page == "🔮 Predict":
     st.sidebar.header("Model selection")
     model_choice = st.sidebar.radio(
         "Which model should make the prediction?",
-        ["Random Forest", "SVM", "KNN (baseline)", "ANN", "Compare all 4"],
+        ["Random Forest", "SVM", "KNN", "ANN", "Compare all 4"],
         index=0,
     )
     st.sidebar.divider()
