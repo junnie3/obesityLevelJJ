@@ -461,18 +461,18 @@ p, .stMarkdown p, li, .stMarkdown li {
 [data-testid="stCaptionContainer"] {
     display: block;
     width: 100%;
-    background: linear-gradient(180deg, #4FA3E3 0%, #2C7FE8 50%, #1155A8 100%) !important;
+    background: linear-gradient(180deg, #FFFFFF 0%, #EAF4FF 45%, #BFE0FF 100%) !important;
     opacity: 1 !important;
     background-blend-mode: normal !important;
     backdrop-filter: none !important;
-    border: 1px solid #0C4384;
+    border: 1px solid #9EC4EA;
     border-radius: 0;
     padding: 0.75rem 1.1rem;
-    box-shadow: 0 3px 8px -3px rgba(20,50,90,0.35);
+    box-shadow: 0 3px 8px -3px rgba(20,50,90,0.2);
 }
 [data-testid="stCaptionContainer"] p,
 [data-testid="stCaptionContainer"] * {
-    color: #FFFFFF !important;
+    color: #16324F !important;
     font-weight: 700;
 }
 
@@ -1095,7 +1095,7 @@ def render_predict_page(model_choice, rf_model, knn_model, svm_model, ann_model,
         "Predict",
         "⚖️ Obesity Level Predictor",
         "Predicts obesity category from eating habits and physical condition, using 4 "
-        "trained models (Random Forest, KNN, SVM, ANN).",
+        "trained models (Random Forest, KNN (baseline), SVM, ANN).",
     )
 
     with st.expander("ℹ️ About this app's inputs"):
@@ -1352,7 +1352,7 @@ if page == "🔮 Predict":
     st.sidebar.header("Model selection")
     model_choice = st.sidebar.radio(
         "Which model should make the prediction?",
-        ["Random Forest", "SVM", "KNN", "ANN", "Compare all 4"],
+        ["Random Forest", "SVM", "KNN (baseline) ", "ANN", "Compare all 4"],
         index=0,
     )
     st.sidebar.divider()
