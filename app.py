@@ -455,20 +455,24 @@ p, .stMarkdown p, li, .stMarkdown li {
     color: #1F2430;
 }
 
-/* st.caption() text: solid opaque blue gradient block, square corners
-   (not a soft rounded translucent pill) */
+/* st.caption() text: single flat solid color, square corners — a gradient
+   made from sky-toned blues just blended into the cloud photo behind it,
+   so this needs to be an unmistakably solid, more saturated block instead */
 [data-testid="stCaptionContainer"] {
     display: block;
     width: 100%;
-    background: linear-gradient(180deg, #BFE0FF 0%, #8FC3F2 55%, #5FA3E0 100%);
-    border: 1px solid #3D7CB8;
+    background: linear-gradient(180deg, #4FA3E3 0%, #2C7FE8 50%, #1155A8 100%) !important;
+    opacity: 1 !important;
+    background-blend-mode: normal !important;
+    backdrop-filter: none !important;
+    border: 1px solid #0C4384;
     border-radius: 0;
     padding: 0.75rem 1.1rem;
     box-shadow: 0 3px 8px -3px rgba(20,50,90,0.35);
 }
 [data-testid="stCaptionContainer"] p,
 [data-testid="stCaptionContainer"] * {
-    color: #0B2C4D !important;
+    color: #FFFFFF !important;
     font-weight: 700;
 }
 
