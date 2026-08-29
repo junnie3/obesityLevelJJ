@@ -455,20 +455,38 @@ p, .stMarkdown p, li, .stMarkdown li {
     color: #1F2430;
 }
 
-/* st.caption() text: wrap it in a light-blue glossy gradient pill instead
-   of leaving it as plain grey text over the photo */
+/* st.caption() text: solid opaque blue gradient block, square corners
+   (not a soft rounded translucent pill) */
 [data-testid="stCaptionContainer"] {
-    display: inline-block;
-    background: linear-gradient(180deg, #EAF4FF 0%, #CFE6FF 55%, #B8D9F5 100%);
-    border: 1px solid #9EC4EA;
-    border-radius: 14px;
-    padding: 0.6rem 1rem;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 3px 8px -3px rgba(20,50,90,0.25);
+    display: block;
+    width: 100%;
+    background: linear-gradient(180deg, #BFE0FF 0%, #8FC3F2 55%, #5FA3E0 100%);
+    border: 1px solid #3D7CB8;
+    border-radius: 0;
+    padding: 0.75rem 1.1rem;
+    box-shadow: 0 3px 8px -3px rgba(20,50,90,0.35);
 }
 [data-testid="stCaptionContainer"] p,
 [data-testid="stCaptionContainer"] * {
-    color: #16324F !important;
-    font-weight: 600;
+    color: #0B2C4D !important;
+    font-weight: 700;
+}
+
+/* ...except inside the sidebar, where it clashed badly with the violet
+   panel — restore plain, unboxed text there */
+section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
+    display: block;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+    width: auto;
+}
+section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p,
+section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] * {
+    color: #D3CBFA !important;
+    font-weight: 500;
 }
 
 
@@ -890,6 +908,17 @@ def render_comparison_charts(df: pd.DataFrame):
             for m in models_present
         ]
 
+        # A solid, square-cornered chip drawn just behind each value label,
+        # instead of a background covering the whole chart panel — same
+        # column width as its bar, positioned right where the text sits.
+        label_chips = alt.Chart(df).mark_bar(
+            clip=False, cornerRadius=0, height=20, dy=-11,
+            fill="#1C6EDB", opacity=0.92,
+        ).encode(
+            x=alt.X("Model:N", sort=models_present, scale=x_scale),
+            y=alt.Y(f"{metric}:Q", scale=y_scale),
+        )
+
         labels = alt.Chart(df).mark_text(
             clip=False,
             align="center",
@@ -897,17 +926,17 @@ def render_comparison_charts(df: pd.DataFrame):
             dy=-8,
             fontSize=14,
             fontWeight="bold",
-            color="#16324F",
+            color="#FFFFFF",
         ).encode(
             x=alt.X("Model:N", sort=models_present, scale=x_scale),
             y=alt.Y(f"{metric}:Q", scale=y_scale),
             text=alt.Text(f"{metric}:Q", format=".2f"),
         )
 
-        return alt.layer(*bar_layers, labels).properties(
+        return alt.layer(*bar_layers, label_chips, labels).properties(
             height=320,
             padding={"top": 25, "left": 5, "right": 5, "bottom": 5},
-            background="rgba(234,244,255,0.6)",
+            background="transparent",
         ).configure_axis(
             labelColor="#16324F", titleColor="#16324F", labelFontWeight="bold",
             gridColor="rgba(22,50,79,0.15)", domainColor="rgba(22,50,79,0.3)",
@@ -943,7 +972,7 @@ def render_comparison_charts(df: pd.DataFrame):
         )
         layered = alt.layer(bars, labels).properties(height=280, width=120)
         grouped = layered.facet(column=alt.Column("Metric:N", title=None)).properties(
-            background="rgba(234,244,255,0.6)"
+            background="transparent"
         ).configure_axis(
             labelColor="#16324F", titleColor="#16324F", labelFontWeight="bold",
             gridColor="rgba(22,50,79,0.15)", domainColor="rgba(22,50,79,0.3)",
@@ -1252,6 +1281,17 @@ def render_predict_page(model_choice, rf_model, knn_model, svm_model, ann_model,
                     for cat, hex_color in zip(categories, category_colors)
                 ]
 
+                # A solid, square-cornered chip drawn just behind each value
+                # label, instead of a background covering the whole chart —
+                # same column width as its bar, right where the text sits.
+                label_chips = alt.Chart(frame_df).mark_bar(
+                    clip=False, cornerRadius=0, height=18, dy=-10,
+                    fill="#1C6EDB", opacity=0.92,
+                ).encode(
+                    x=alt.X("Category:N", sort=categories, scale=x_scale),
+                    y=alt.Y("Probability:Q", scale=y_scale),
+                )
+
                 labels = alt.Chart(frame_df).mark_text(
                     clip=False,
                     align="center",
@@ -1259,17 +1299,17 @@ def render_predict_page(model_choice, rf_model, knn_model, svm_model, ann_model,
                     dy=-8,
                     fontSize=13,
                     fontWeight="bold",
-                    color="#16324F",
+                    color="#FFFFFF",
                 ).encode(
                     x=alt.X("Category:N", sort=categories, scale=x_scale),
                     y=alt.Y("Probability:Q", scale=y_scale),
                     text=alt.Text("Probability_final:Q", format=".1%"),
                 )
 
-                return alt.layer(*bar_layers, labels).properties(
+                return alt.layer(*bar_layers, label_chips, labels).properties(
                     height=350,
                     padding={"top": 20, "left": 5, "right": 5, "bottom": 5},
-                    background="rgba(234,244,255,0.6)",
+                    background="transparent",
                 ).configure_axis(
                     labelColor="#16324F", titleColor="#16324F", labelFontWeight="bold",
                     gridColor="rgba(22,50,79,0.15)", domainColor="rgba(22,50,79,0.3)",
