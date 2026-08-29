@@ -908,17 +908,6 @@ def render_comparison_charts(df: pd.DataFrame):
             for m in models_present
         ]
 
-        # A solid, square-cornered chip drawn just behind each value label,
-        # instead of a background covering the whole chart panel — same
-        # column width as its bar, positioned right where the text sits.
-        label_chips = alt.Chart(df).mark_bar(
-            clip=False, cornerRadius=0, height=20, dy=-11,
-            fill="#1C6EDB", opacity=0.92,
-        ).encode(
-            x=alt.X("Model:N", sort=models_present, scale=x_scale),
-            y=alt.Y(f"{metric}:Q", scale=y_scale),
-        )
-
         labels = alt.Chart(df).mark_text(
             clip=False,
             align="center",
@@ -926,14 +915,14 @@ def render_comparison_charts(df: pd.DataFrame):
             dy=-8,
             fontSize=14,
             fontWeight="bold",
-            color="#FFFFFF",
+            color="#16324F",
         ).encode(
             x=alt.X("Model:N", sort=models_present, scale=x_scale),
             y=alt.Y(f"{metric}:Q", scale=y_scale),
             text=alt.Text(f"{metric}:Q", format=".2f"),
         )
 
-        return alt.layer(*bar_layers, label_chips, labels).properties(
+        return alt.layer(*bar_layers, labels).properties(
             height=320,
             padding={"top": 25, "left": 5, "right": 5, "bottom": 5},
             background="transparent",
@@ -1281,17 +1270,6 @@ def render_predict_page(model_choice, rf_model, knn_model, svm_model, ann_model,
                     for cat, hex_color in zip(categories, category_colors)
                 ]
 
-                # A solid, square-cornered chip drawn just behind each value
-                # label, instead of a background covering the whole chart —
-                # same column width as its bar, right where the text sits.
-                label_chips = alt.Chart(frame_df).mark_bar(
-                    clip=False, cornerRadius=0, height=18, dy=-10,
-                    fill="#1C6EDB", opacity=0.92,
-                ).encode(
-                    x=alt.X("Category:N", sort=categories, scale=x_scale),
-                    y=alt.Y("Probability:Q", scale=y_scale),
-                )
-
                 labels = alt.Chart(frame_df).mark_text(
                     clip=False,
                     align="center",
@@ -1299,14 +1277,14 @@ def render_predict_page(model_choice, rf_model, knn_model, svm_model, ann_model,
                     dy=-8,
                     fontSize=13,
                     fontWeight="bold",
-                    color="#FFFFFF",
+                    color="#16324F",
                 ).encode(
                     x=alt.X("Category:N", sort=categories, scale=x_scale),
                     y=alt.Y("Probability:Q", scale=y_scale),
                     text=alt.Text("Probability_final:Q", format=".1%"),
                 )
 
-                return alt.layer(*bar_layers, label_chips, labels).properties(
+                return alt.layer(*bar_layers, labels).properties(
                     height=350,
                     padding={"top": 20, "left": 5, "right": 5, "bottom": 5},
                     background="transparent",
