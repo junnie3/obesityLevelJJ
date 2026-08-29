@@ -201,13 +201,13 @@ st.set_page_config(page_title="Obesity Level Predictor", page_icon="⚖️", lay
 
 CUSTOM_CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:wght@600;700;800;900&display=swap');
 
 html, body, [class*="css"], .stMarkdown, .stText, p, span, label, div {
     font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 h1, h2, h3, h4, h5, h6, .hero-title {
-    font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+    font-family: 'Playfair Display', Georgia, 'Times New Roman', serif !important;
     font-weight: 800 !important;
     letter-spacing: -0.01em;
 }
@@ -219,7 +219,7 @@ h1, h2, h3, h4, h5, h6, .hero-title {
    busy mountain/water detail without giving up the photo entirely. */
 .stApp {
     background-image:
-        linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.55) 45%, rgba(255,255,255,0.68) 100%),
+        linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.34) 45%, rgba(255,255,255,0.46) 100%),
         url('https://images.unsplash.com/photo-1607602274042-161d6cba839a?auto=format&fit=crop&w=1920&q=80');
     background-size: cover;
     background-position: 50% 30%;
@@ -442,7 +442,36 @@ hr {
 }
 
 /* ================================================================
-   FANCY PASS: animated backdrop, glow, and per-card vector scenery
+   Darker body text + glossy light-blue "chip" backgrounds for captions
+   and secondary text that sit directly on the photo backdrop (outside
+   the colored cards), so they're never just grey text floating on a
+   busy background — mirrors the rounded gradient chip / badge look
+   from the reference UI kit.
+   ================================================================ */
+
+/* body copy: darker than the previous muted grey, for contrast against
+   the photo backdrop */
+p, .stMarkdown p, li, .stMarkdown li {
+    color: #1F2430;
+}
+
+/* st.caption() text: wrap it in a light-blue glossy gradient pill instead
+   of leaving it as plain grey text over the photo */
+[data-testid="stCaptionContainer"] {
+    display: inline-block;
+    background: linear-gradient(180deg, #EAF4FF 0%, #CFE6FF 55%, #B8D9F5 100%);
+    border: 1px solid #9EC4EA;
+    border-radius: 14px;
+    padding: 0.6rem 1rem;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 3px 8px -3px rgba(20,50,90,0.25);
+}
+[data-testid="stCaptionContainer"] p,
+[data-testid="stCaptionContainer"] * {
+    color: #16324F !important;
+    font-weight: 600;
+}
+
+
    ================================================================ */
 
 @keyframes skyDrift {
@@ -868,7 +897,7 @@ def render_comparison_charts(df: pd.DataFrame):
             dy=-8,
             fontSize=14,
             fontWeight="bold",
-            color="#3A2E70",
+            color="#16324F",
         ).encode(
             x=alt.X("Model:N", sort=models_present, scale=x_scale),
             y=alt.Y(f"{metric}:Q", scale=y_scale),
@@ -878,7 +907,10 @@ def render_comparison_charts(df: pd.DataFrame):
         return alt.layer(*bar_layers, labels).properties(
             height=320,
             padding={"top": 25, "left": 5, "right": 5, "bottom": 5},
-            background="transparent",
+            background="rgba(234,244,255,0.6)",
+        ).configure_axis(
+            labelColor="#16324F", titleColor="#16324F", labelFontWeight="bold",
+            gridColor="rgba(22,50,79,0.15)", domainColor="rgba(22,50,79,0.3)",
         )
 
     metric_labels = [m.replace("_", " ") for m in metric_cols]
@@ -911,7 +943,10 @@ def render_comparison_charts(df: pd.DataFrame):
         )
         layered = alt.layer(bars, labels).properties(height=280, width=120)
         grouped = layered.facet(column=alt.Column("Metric:N", title=None)).properties(
-            background="transparent"
+            background="rgba(234,244,255,0.6)"
+        ).configure_axis(
+            labelColor="#16324F", titleColor="#16324F", labelFontWeight="bold",
+            gridColor="rgba(22,50,79,0.15)", domainColor="rgba(22,50,79,0.3)",
         )
         st.altair_chart(grouped, use_container_width=False, key="cmp_chart_grouped")
 
@@ -1224,7 +1259,7 @@ def render_predict_page(model_choice, rf_model, knn_model, svm_model, ann_model,
                     dy=-8,
                     fontSize=13,
                     fontWeight="bold",
-                    color="#3A2E70",
+                    color="#16324F",
                 ).encode(
                     x=alt.X("Category:N", sort=categories, scale=x_scale),
                     y=alt.Y("Probability:Q", scale=y_scale),
@@ -1234,7 +1269,10 @@ def render_predict_page(model_choice, rf_model, knn_model, svm_model, ann_model,
                 return alt.layer(*bar_layers, labels).properties(
                     height=350,
                     padding={"top": 20, "left": 5, "right": 5, "bottom": 5},
-                    background="transparent",
+                    background="rgba(234,244,255,0.6)",
+                ).configure_axis(
+                    labelColor="#16324F", titleColor="#16324F", labelFontWeight="bold",
+                    gridColor="rgba(22,50,79,0.15)", domainColor="rgba(22,50,79,0.3)",
                 )
 
             animate_bar_growth(proba_df, "Probability", build_proba_chart, key=f"proba_chart_{model_name}")
