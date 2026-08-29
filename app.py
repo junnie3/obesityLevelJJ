@@ -480,11 +480,11 @@ p, .stMarkdown p, li, .stMarkdown li {
    panel — restore plain, unboxed text there */
 section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
     display: block;
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    padding: 0;
-    box-shadow: none;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
     width: auto;
 }
 section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p,
@@ -1309,7 +1309,7 @@ def render_predict_page(model_choice, rf_model, knn_model, svm_model, ann_model,
         )
 
         if model_choice == "Compare all 4":
-            compare_names = ["Random Forest", "SVM", "KNN", "ANN"]
+            compare_names = ["Random Forest", "SVM", "KNN (baseline)", "ANN"]
             selected_compare_model = st.radio(
                 "View prediction for:", compare_names, horizontal=True, key="compare_model_view",
             )
@@ -1352,7 +1352,7 @@ if page == "🔮 Predict":
     st.sidebar.header("Model selection")
     model_choice = st.sidebar.radio(
         "Which model should make the prediction?",
-        ["Random Forest", "SVM", "KNN (baseline) ", "ANN", "Compare all 4"],
+        ["Random Forest", "SVM", "KNN (baseline)", "ANN", "Compare all 4"],
         index=0,
     )
     st.sidebar.divider()
