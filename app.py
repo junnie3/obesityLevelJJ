@@ -1214,7 +1214,7 @@ def render_predict_page(model_choice, rf_model, knn_model, svm_model, ann_model,
             if model_name == "Random Forest":
                 return rf_model.predict_proba(X_values)[0]
 
-            if model_name == "KNN":
+            if model_name == "KNN (Baseline)":
                 return knn_model.predict_proba(X_values)[0]
 
             if model_name == "SVM":
@@ -1261,14 +1261,22 @@ def render_predict_page(model_choice, rf_model, knn_model, svm_model, ann_model,
             def build_proba_chart(frame_df):
                 y_scale = alt.Scale(domain=[0, 1.08])
 
+                # Native axis labels can't have a background box behind just
+                # the text (Vega-Lite doesn't support that), so we hide them
+                # and draw our own text + rect-chip layers in their place —
+                # possible here because we know the exact category list and
+                # y-tick values ahead of time.
+                x_axis = alt.Axis(title="Obesity Level", labels=False)
+                y_axis = alt.Axis(title="Probability", labels=False)
+
                 bar_layers = [
                     alt.Chart(frame_df[frame_df["Category"] == cat]).mark_bar(
                         clip=False, cornerRadiusTopLeft=8, cornerRadiusTopRight=8,
                         fill=metallic_gradient(hex_color),
                         stroke="#FFFFFF", strokeWidth=1, strokeOpacity=0.35,
                     ).encode(
-                        x=alt.X("Category:N", sort=categories, scale=x_scale, title="Obesity Level"),
-                        y=alt.Y("Probability:Q", title="Probability", scale=y_scale),
+                        x=alt.X("Category:N", sort=categories, scale=x_scale, axis=x_axis),
+                        y=alt.Y("Probability:Q", scale=y_scale, axis=y_axis),
                         tooltip=["Category", alt.Tooltip("Probability_final:Q", format=".2%")],
                     )
                     for cat, hex_color in zip(categories, category_colors)
@@ -1283,14 +1291,54 @@ def render_predict_page(model_choice, rf_model, knn_model, svm_model, ann_model,
                     fontWeight="bold",
                     color="#16324F",
                 ).encode(
-                    x=alt.X("Category:N", sort=categories, scale=x_scale),
-                    y=alt.Y("Probability:Q", scale=y_scale),
+                    x=alt.X("Category:N", sort=categories, scale=x_scale, axis=x_axis),
+                    y=alt.Y("Probability:Q", scale=y_scale, axis=y_axis),
                     text=alt.Text("Probability_final:Q", format=".1%"),
                 )
 
-                return alt.layer(*bar_layers, labels).properties(
+                # --- custom x-axis category chips (replace the hidden native labels) ---
+                cat_df = pd.DataFrame({"Category": categories, "Zero": 0.0})
+                cat_chip_bg = alt.Chart(cat_df).mark_rect(
+                    clip=False, cornerRadius=0, width=16, height=92, dy=54,
+                    fill="#EAF4FF", opacity=0.95, stroke="#9EC4EA", strokeWidth=1,
+                ).encode(
+                    x=alt.X("Category:N", sort=categories, scale=x_scale, axis=None),
+                    y=alt.Y("Zero:Q", scale=y_scale, axis=None),
+                )
+                cat_chip_text = alt.Chart(cat_df).mark_text(
+                    clip=False, angle=270, align="center", baseline="middle",
+                    dy=54, fontSize=11, fontWeight="bold", color="#16324F",
+                ).encode(
+                    x=alt.X("Category:N", sort=categories, scale=x_scale, axis=None),
+                    y=alt.Y("Zero:Q", scale=y_scale, axis=None),
+                    text="Category:N",
+                )
+
+                # --- custom y-axis tick chips (replace the hidden native labels) ---
+                y_ticks = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+                tick_df = pd.DataFrame({"Tick": y_ticks, "Label": [f"{t:.1f}" for t in y_ticks]})
+                tick_chip_bg = alt.Chart(tick_df).mark_rect(
+                    clip=False, cornerRadius=0, width=30, height=16, dx=-38,
+                    fill="#EAF4FF", opacity=0.95, stroke="#9EC4EA", strokeWidth=1,
+                ).encode(
+                    x=alt.value(0),
+                    y=alt.Y("Tick:Q", scale=y_scale, axis=None),
+                )
+                tick_chip_text = alt.Chart(tick_df).mark_text(
+                    clip=False, align="center", baseline="middle",
+                    dx=-38, fontSize=10, fontWeight="bold", color="#16324F",
+                ).encode(
+                    x=alt.value(0),
+                    y=alt.Y("Tick:Q", scale=y_scale, axis=None),
+                    text="Label:N",
+                )
+
+                return alt.layer(
+                    *bar_layers, tick_chip_bg, tick_chip_text,
+                    cat_chip_bg, cat_chip_text, labels,
+                ).properties(
                     height=350,
-                    padding={"top": 20, "left": 5, "right": 5, "bottom": 5},
+                    padding={"top": 20, "left": 55, "right": 5, "bottom": 110},
                     background="transparent",
                 ).configure_axis(
                     labelColor="#16324F", titleColor="#16324F", labelFontWeight="bold",
@@ -1309,7 +1357,7 @@ def render_predict_page(model_choice, rf_model, knn_model, svm_model, ann_model,
         )
 
         if model_choice == "Compare all 4":
-            compare_names = ["Random Forest", "SVM", "KNN", "ANN"]
+            compare_names = ["Random Forest", "SVM", "KNN (Baseline)", "ANN"]
             selected_compare_model = st.radio(
                 "View prediction for:", compare_names, horizontal=True, key="compare_model_view",
             )
@@ -1352,7 +1400,7 @@ if page == "🔮 Predict":
     st.sidebar.header("Model selection")
     model_choice = st.sidebar.radio(
         "Which model should make the prediction?",
-        ["Random Forest", "SVM", "KNN", "ANN", "Compare all 4"],
+        ["Random Forest", "SVM", "KNN (Baseline)", "ANN", "Compare all 4"],
         index=0,
     )
     st.sidebar.divider()
